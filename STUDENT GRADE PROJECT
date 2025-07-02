@@ -1,0 +1,81 @@
+import java.util.Scanner;
+
+public class GradeTracker {
+
+    // Inner class to represent a student
+    static class Student {
+        String name;
+        int[] scores;
+
+        Student(String name, int[] scores) {
+            this.name = name;
+            this.scores = scores;
+        }
+
+        double getAverage() {
+            int sum = 0;
+            for (int score : scores) {
+                sum += score;
+            }
+            return (double) sum / scores.length;
+        }
+
+        int getHighest() {
+            int max = scores[0];
+            for (int score : scores) {
+                if (score > max) {
+                    max = score;
+                }
+            }
+            return max;
+        }
+
+        int getLowest() {
+            int min = scores[0];
+            for (int score : scores) {
+                if (score < min) {
+                    min = score;
+                }
+            }
+            return min;
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter number of students: ");
+        int numStudents = scanner.nextInt();
+        scanner.nextLine(); // consume newline
+
+        Student[] students = new Student[numStudents];
+
+        for (int i = 0; i < numStudents; i++) {
+            System.out.print("\nEnter name of student " + (i + 1) + ": ");
+            String name = scanner.nextLine();
+
+            System.out.print("Enter number of subjects: ");
+            int numSubjects = scanner.nextInt();
+            int[] scores = new int[numSubjects];
+
+            for (int j = 0; j < numSubjects; j++) {
+                System.out.print("Enter score for subject " + (j + 1) + ": ");
+                scores[j] = scanner.nextInt();
+            }
+            scanner.nextLine(); // consume newline
+            students[i] = new Student(name, scores);
+        }
+
+        // Display summary
+        System.out.println("\n====== Summary Report ======");
+        for (Student student : students) {
+            System.out.println("Name: " + student.name);
+            System.out.printf("Average Score: %.2f\n", student.getAverage());
+            System.out.println("Highest Score: " + student.getHighest());
+            System.out.println("Lowest Score: " + student.getLowest());
+            System.out.println("-----------------------------");
+        }
+
+        scanner.close();
+    }
+}
