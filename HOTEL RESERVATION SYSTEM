@@ -1,0 +1,191 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+
+    static class Room {
+        private int roomNumber;
+        private String type;
+        private boolean isBooked;
+
+        public Room(int roomNumber, String type) {
+            this.roomNumber = roomNumber;
+            this.type = type;
+            this.isBooked = false;
+        }
+
+        public int getRoomNumber() {
+            return roomNumber;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public boolean isBooked() {
+            return isBooked;
+        }
+
+        public void book() {
+            isBooked = true;
+        }
+
+        public void cancelBooking() {
+            isBooked = false;
+        }
+
+        @Override
+        public String toString() {
+            return roomNumber + "," + type + "," + isBooked;
+        }
+
+        public static Room fromString(String line) {
+            String[] parts = line.split(",");
+            Room room = new Room(Integer.parseInt(parts[0]), parts[1]);
+            if (Boolean.parseBoolean(parts[2])) {
+                room.book();
+            }
+            return room;
+        }
+    }
+
+    static class Booking {
+        private String name;
+        private int roomNumber;
+        private String paymentStatus;
+
+        public Booking(String name, int roomNumber, String paymentStatus) {
+            this.name = name;
+            this.roomNumber = roomNumber;
+            this.paymentStatus = paymentStatus;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getRoomNumber() {
+            return roomNumber;
+        }
+
+        @Override
+        public String toString() {
+            return name + "," + roomNumber + "," + paymentStatus;
+        }
+
+        public static Booking fromString(String line) {
+            String[] parts = line.split(",");
+            return new Booking(parts[0], Integer.parseInt(parts[1]), parts[2]);
+        }
+    }
+
+    static class Hotel {
+        private List<Room> rooms = new ArrayList<>();
+        private List<Booking> bookings = new ArrayList<>();
+
+        public Hotel() {
+            createDefaultRooms();
+        }
+
+        private void createDefaultRooms() {
+            for (int i = 1; i <= 10; i++) {
+                String type = (i <= 4) ? "Standard" : (i <= 7) ? "Deluxe" : "Suite";
+                rooms.add(new Room(i, type));
+            }
+        }
+
+        public void showAvailableRooms() {
+            System.out.println("\nAvailable Rooms:");
+            for (Room room : rooms) {
+                if (!room.isBooked()) {
+                    System.out.println("Room " + room.getRoomNumber() + " - " + room.getType());
+                }
+            }
+        }
+
+        public void bookRoom(String name, String roomType) {
+            for (Room room : rooms) {
+                if (!room.isBooked() && room.getType().equalsIgnoreCase(roomType)) {
+                    room.book();
+                    bookings.add(new Booking(name, room.getRoomNumber(), "Paid"));
+                    System.out.println("✅ Room booked successfully! Room Number: " + room.getRoomNumber());
+                    return;
+                }
+            }
+            System.out.println("❌ No rooms available in the selected category.");
+        }
+
+        public void cancelBooking(String name) {
+            Iterator<Booking> iterator = bookings.iterator();
+            while (iterator.hasNext()) {
+                Booking booking = iterator.next();
+                if (booking.getName().equalsIgnoreCase(name)) {
+                    for (Room room : rooms) {
+                        if (room.getRoomNumber() == booking.getRoomNumber()) {
+                            room.cancelBooking();
+                            iterator.remove();
+                            System.out.println("✅ Booking cancelled for " + name);
+                            return;
+                        }
+                    }
+                }
+            }
+            System.out.println("❌ No booking found under the name: " + name);
+        }
+
+        public void viewBookings() {
+            System.out.println("\nAll Bookings:");
+            if (bookings.isEmpty()) {
+                System.out.println("No bookings yet.");
+            } else {
+                for (Booking booking : bookings) {
+                    System.out.println("Name: " + booking.getName() + ", Room: " + booking.getRoomNumber());
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Hotel hotel = new Hotel();
+        int choice;
+
+        do {
+            System.out.println("\n========= HOTEL RESERVATION MENU =========");
+            System.out.println("1. View Available Rooms");
+            System.out.println("2. Book a Room");
+            System.out.println("3. Cancel Booking");
+            System.out.println("4. View All Bookings");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice (1-5): ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // clear buffer
+
+            switch (choice) {
+                case 1:
+                    hotel.showAvailableRooms();
+                    break;
+                case 2:
+                    System.out.print("Enter your name: ");
+                    String name = scanner.nextLine();
+                    System.out.print("Enter room type (Standard/Deluxe/Suite): ");
+                    String type = scanner.nextLine();
+                    hotel.bookRoom(name, type);
+                    break;
+                case 3:
+                    System.out.print("Enter your name to cancel booking: ");
+                    String cancelName = scanner.nextLine();
+                    hotel.cancelBooking(cancelName);
+                    break;
+                case 4:
+                    hotel.viewBookings();
+                    break;
+                case 5:
+                    System.out.println("Thank you for using the Hotel Reservation System!");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        } while (choice != 5);
+    }
+}
